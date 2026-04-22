@@ -1,7 +1,3 @@
-import os
-
-readme_content = '''# Survival Calculator (iPhone Style)
-
 비상 저장소(Emergency Storage)에서 발견한 물자를 관리하고 생존 시간을 계산하기 위해 제작된 PyQt5 기반의 계산기 프로젝트입니다. 석기 시대에 돌을 깨서 도구를 만들 듯, 현대의 개발 환경에서 Python을 도구 삼아 필요한 시스템을 직접 구축했습니다.
 
 ## 1. 프로젝트 개요
