@@ -1,9 +1,3 @@
-"""아이폰 스타일 계산기.
-
-Calculator 클래스(연산 코어) + CalculatorUI 위젯(PyQt5)을 한 파일에 담았다.
-PEP 8 스타일을 준수하며, 외부 라이브러리는 PyQt5만 사용한다.
-"""
-
 import sys
 
 from PyQt5.QtCore import Qt
