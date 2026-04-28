@@ -1,11 +1,16 @@
+"""아이폰 스타일 계산기.
+
+Calculator 클래스(연산 코어) + CalculatorUI 위젯(PyQt5)을 한 파일에 담았다.
+PEP 8 스타일을 준수하며, 외부 라이브러리는 PyQt5만 사용한다.
+"""
+
 import sys
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import (
     QApplication,
     QGridLayout,
-    QLabel,
+    QLineEdit,
     QPushButton,
     QVBoxLayout,
     QWidget,
@@ -13,9 +18,9 @@ from PyQt5.QtWidgets import (
 
 
 class Calculator:
-    """계산기의 핵심 연산을 담당하는 클래스."""
+    """계산기의 핵심 연산을 담당하는 클래스 (UI와 무관)."""
 
-    # 처리 가능한 숫자 범위 한계 (float 최대값 근방)
+    # 처리 가능한 숫자 범위 한계 (float 한계 근방)
     MAX_VALUE = 1e308
     # 소수점 반올림 자릿수 (보너스 과제)
     DECIMAL_PLACES = 6
@@ -182,150 +187,194 @@ class Calculator:
         return text if text else '0'
 
 
-# ----------------------------------------------------------------------
-# UI
-# ----------------------------------------------------------------------
 class CalculatorUI(QWidget):
     """아이폰 스타일 계산기 UI."""
 
-    # 버튼 정의: (텍스트, row, col, row_span, col_span, 카테고리)
-    BUTTONS = (
-        ('AC', 1, 0, 1, 1, 'function'),
-        ('+/-', 1, 1, 1, 1, 'function'),
-        ('%', 1, 2, 1, 1, 'function'),
-        ('/', 1, 3, 1, 1, 'operator'),
-        ('7', 2, 0, 1, 1, 'digit'),
-        ('8', 2, 1, 1, 1, 'digit'),
-        ('9', 2, 2, 1, 1, 'digit'),
-        ('*', 2, 3, 1, 1, 'operator'),
-        ('4', 3, 0, 1, 1, 'digit'),
-        ('5', 3, 1, 1, 1, 'digit'),
-        ('6', 3, 2, 1, 1, 'digit'),
-        ('-', 3, 3, 1, 1, 'operator'),
-        ('1', 4, 0, 1, 1, 'digit'),
-        ('2', 4, 1, 1, 1, 'digit'),
-        ('3', 4, 2, 1, 1, 'digit'),
-        ('+', 4, 3, 1, 1, 'operator'),
-        ('0', 5, 0, 1, 2, 'digit'),
-        ('.', 5, 2, 1, 1, 'digit'),
-        ('=', 5, 3, 1, 1, 'operator'),
-    )
-
-    STYLE_DIGIT = (
-        'QPushButton {'
-        '  background-color: #333333; color: white;'
-        '  border: none; border-radius: 35px; font-size: 24px;'
-        '}'
-        'QPushButton:pressed { background-color: #555555; }'
-    )
-    STYLE_FUNCTION = (
-        'QPushButton {'
-        '  background-color: #a5a5a5; color: black;'
-        '  border: none; border-radius: 35px; font-size: 22px;'
-        '}'
-        'QPushButton:pressed { background-color: #d4d4d2; }'
-    )
-    STYLE_OPERATOR = (
-        'QPushButton {'
-        '  background-color: #ff9500; color: white;'
-        '  border: none; border-radius: 35px; font-size: 28px;'
-        '}'
-        'QPushButton:pressed { background-color: #ffb143; }'
-    )
+    # 화면에 표시되는 기호와 내부 연산자의 매핑 (× → *, ÷ → /)
+    DISPLAY_TO_OP = {
+        '+': '+',
+        '-': '-',
+        '×': '*',
+        '÷': '/',
+    }
 
     def __init__(self):
         super().__init__()
         self.calc = Calculator()
-        self._init_ui()
+        # 디스플레이 폰트 사이즈 자동 조정용 기준값
+        self._base_font_size = 70
+        # 화면에 함께 보여줄 '왼쪽 피연산자'와 '연산자 기호'
+        # (연산자가 눌렸을 때만 값이 채워진다)
+        self._operand_text = ''
+        self._operator_symbol = ''
+        self.init_ui()
 
-    def _init_ui(self):
-        self.setWindowTitle('계산기')
+    # ------------------------------------------------------------------
+    # UI 구성
+    # ------------------------------------------------------------------
+    def init_ui(self):
+        """계산기 화면의 외형과 배치를 정의하는 핵심 함수."""
+        self.setWindowTitle('아이폰 계산기')
+        self.setFixedSize(350, 500)
         self.setStyleSheet('background-color: black;')
-        self.setFixedSize(320, 500)
 
+        # [메인 수직 레이아웃] 화면 상단(숫자창)과 하단(버튼들)을 세로로 배치한다.
         main_layout = QVBoxLayout()
-        main_layout.setContentsMargins(15, 15, 15, 15)
-        main_layout.setSpacing(10)
+        main_layout.setContentsMargins(20, 20, 20, 20)
+        main_layout.setSpacing(12)
 
-        # 디스플레이
-        self.display = QLabel('0')
-        self.display.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        self.display.setStyleSheet('color: white; padding-right: 10px;')
-        self._base_font_size = 56
-        self.display.setFont(QFont('Helvetica', self._base_font_size))
-        self.display.setMinimumHeight(90)
+        # [숫자 표시창]
+        self.display = QLineEdit('0')
+        self.display.setAlignment(Qt.AlignRight)
+        self.display.setReadOnly(True)
+        self._apply_display_style(self._base_font_size)
         main_layout.addWidget(self.display)
 
-        # 버튼 그리드
-        grid = QGridLayout()
-        grid.setSpacing(8)
+        # [버튼 그리드 레이아웃] 버튼들을 바둑판(행/열) 형태로 배치한다.
+        grid_layout = QGridLayout()
+        grid_layout.setSpacing(12)
 
-        for text, row, col, rs, cs, kind in self.BUTTONS:
-            btn = QPushButton(text)
-            btn.setFixedHeight(70)
-            if cs == 1:
-                btn.setFixedWidth(70)
-            else:
-                btn.setMinimumWidth(70 * cs + 8)
-            if kind == 'digit':
-                btn.setStyleSheet(self.STYLE_DIGIT)
-            elif kind == 'function':
-                btn.setStyleSheet(self.STYLE_FUNCTION)
-            else:
-                btn.setStyleSheet(self.STYLE_OPERATOR)
-            btn.clicked.connect(lambda _checked, t=text: self._on_click(t))
-            grid.addWidget(btn, row, col, rs, cs)
+        # 버튼 데이터: (라벨, 타입). 타입 0=기능, 1=숫자, 2=연산
+        buttons = [
+            [('AC', 0), ('+/-', 0), ('%', 0), ('÷', 2)],
+            [('7', 1), ('8', 1), ('9', 1), ('×', 2)],
+            [('4', 1), ('5', 1), ('6', 1), ('-', 2)],
+            [('1', 1), ('2', 1), ('3', 1), ('+', 2)],
+        ]
 
-        main_layout.addLayout(grid)
+        for row, row_buttons in enumerate(buttons):
+            for col, (text, btn_type) in enumerate(row_buttons):
+                button = QPushButton(text)
+                self.style_button(button, btn_type)
+                button.clicked.connect(self.button_clicked)
+                grid_layout.addWidget(button, row, col)
+
+        # [특수: '0' 버튼은 가로 두 칸을 차지한다]
+        btn_0 = QPushButton('0')
+        self.style_button(btn_0, 1)
+        btn_0.setFixedSize(152, 70)
+        btn_0.clicked.connect(self.button_clicked)
+        grid_layout.addWidget(btn_0, 4, 0, 1, 2)
+
+        # [소수점 버튼]
+        btn_dot = QPushButton('.')
+        self.style_button(btn_dot, 1)
+        btn_dot.clicked.connect(self.button_clicked)
+        grid_layout.addWidget(btn_dot, 4, 2)
+
+        # [등호 버튼]
+        btn_eq = QPushButton('=')
+        self.style_button(btn_eq, 2)
+        btn_eq.clicked.connect(self.button_clicked)
+        grid_layout.addWidget(btn_eq, 4, 3)
+
+        main_layout.addLayout(grid_layout)
         self.setLayout(main_layout)
+
+    def style_button(self, button, btn_type):
+        """버튼에 iOS 감성의 CSS 스타일을 입히는 함수."""
+        button.setFixedSize(70, 70)
+        base_style = 'border-radius: 35px; font-size: 25px; font-weight: bold;'
+
+        if btn_type == 0:    # 상단 AC, +/-, %
+            style = base_style + 'background-color: #A5A5A5; color: black;'
+        elif btn_type == 1:  # 숫자 및 소수점
+            style = base_style + 'background-color: #333333; color: white;'
+        else:                # 사칙연산
+            style = base_style + 'background-color: #FF9F0A; color: white; font-size: 30px;'
+
+        button.setStyleSheet(style)
+
+    def _apply_display_style(self, font_size):
+        """디스플레이 스타일시트를 적용한다 (폰트 사이즈 가변)."""
+        self.display.setStyleSheet(
+            'border: none;'
+            'color: white;'
+            'background-color: black;'
+            f'font-size: {font_size}px;'
+            'font-weight: 300;'
+            'padding-bottom: 10px;'
+        )
 
     # ------------------------------------------------------------------
     # 이벤트
     # ------------------------------------------------------------------
-    def _on_click(self, text):
-        if text.isdigit():
-            self.calc.input_digit(text)
-        elif text == '.':
-            self.calc.input_dot()
-        elif text == 'AC':
+    def button_clicked(self):
+        """버튼 클릭 시 Calculator 클래스로 동작을 위임한다."""
+        sender = self.sender()
+        text = sender.text()
+
+        if text == 'AC':
             self.calc.reset()
+            self._operand_text = ''
+            self._operator_symbol = ''
+        elif text == '=':
+            self.calc.equal()
+            # 결과만 보이도록 표시용 prefix 제거
+            self._operand_text = ''
+            self._operator_symbol = ''
         elif text == '+/-':
             self.calc.negative_positive()
         elif text == '%':
             self.calc.percent()
-        elif text in ('+', '-', '*', '/'):
-            self.calc.set_operator(text)
-        elif text == '=':
-            self.calc.equal()
+            # 퍼센트 결과만 깔끔하게 보여주기 위해 prefix 제거
+            self._operand_text = ''
+            self._operator_symbol = ''
+        elif text in self.DISPLAY_TO_OP:
+            self.calc.set_operator(self.DISPLAY_TO_OP[text])
+            # 체인 계산이 있었다면 calc.current 가 결과로 갱신된 상태.
+            # 화면에는 "<왼쪽피연산자> <연산자>" 형태로 표시한다.
+            if self.calc.current not in ('Error', 'Overflow'):
+                self._operand_text = self.calc.current
+                self._operator_symbol = text
+            else:
+                self._operand_text = ''
+                self._operator_symbol = ''
+        elif text == '.':
+            self.calc.input_dot()
+        elif text.isdigit():
+            self.calc.input_digit(text)
+
         self._update_display()
 
     def _update_display(self):
-        text = self.calc.current
+        """Calculator의 현재 값을 화면에 반영하고 폰트 사이즈를 조정한다."""
+        if self.calc.current in ('Error', 'Overflow'):
+            text = self.calc.current
+        elif self._operator_symbol:
+            # 연산자가 마지막에 눌린 상태이거나 그 이후 숫자 입력 중
+            if self.calc.start_new:
+                # 연산자 직후 — 다음 숫자가 아직 안 들어옴
+                text = f'{self._operand_text} {self._operator_symbol}'
+            else:
+                # 다음 숫자 입력 중
+                text = (
+                    f'{self._operand_text} {self._operator_symbol} '
+                    f'{self.calc.current}'
+                )
+        else:
+            text = self.calc.current
         self.display.setText(text)
         self._adjust_font_size(text)
 
     def _adjust_font_size(self, text):
-        """보너스 과제: 길이에 따라 폰트 크기를 조정한다."""
+        """보너스 과제: 표시 길이에 따라 폰트 크기를 조정한다."""
         length = len(text)
         if length <= 7:
-            size = self._base_font_size
+            size = self._base_font_size  # 70
         elif length <= 9:
-            size = 46
+            size = 56
         elif length <= 12:
-            size = 36
+            size = 44
         elif length <= 16:
-            size = 28
+            size = 34
         else:
-            size = 22
-        self.display.setFont(QFont('Helvetica', size))
-
-
-def main():
-    app = QApplication(sys.argv)
-    window = CalculatorUI()
-    window.show()
-    sys.exit(app.exec_())
+            size = 26
+        self._apply_display_style(size)
 
 
 if __name__ == '__main__':
-    main()
+    app = QApplication(sys.argv)
+    calc = CalculatorUI()
+    calc.show()
+    sys.exit(app.exec_())
