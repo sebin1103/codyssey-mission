@@ -381,3 +381,17 @@ class Calculator:
 - 대입문 `=` 앞뒤 공백
 - 들여쓰기는 공백 4칸
 - 외부 라이브러리는 UI용 `PyQt5`만 사용 (그 외는 모두 파이썬 표준 기능)
+
+
+## 실행화면
+- 숫자키를 누를 때 마다 화면에 숫자가 누적된다.
+- 계산 결과가 출력될 때 출력되는 값의 길이에 따라서 폰트의 크기를 조정해서 전체 내용이 한번에 출력될 수 있도록 한다.
+<img width="319" height="523" alt="스크린샷 2026-04-28 오후 4 29 28" src="https://github.com/user-attachments/assets/782f3b30-ac8d-4710-8ce4-eacf93aea375" />
+
+- 소수점 키를 누르면 소수점이 입력된다. 단 이미 소수점이 입력되어 있는 상태에서는 추가로 입력되지 않는다.
+<img width="337" height="520" alt="스크린샷 2026-04-30 오전 5 20 41" src="https://github.com/user-attachments/assets/81d8a301-2840-4185-940b-6e9015c7af22" />
+
+- 소수점 6자리 이하의 경우 반올림한 결과로 줄여서 출력한다.
+<img width="345" height="519" alt="스크린샷 2026-04-30 오전 5 33 46" src="https://github.com/user-attachments/assets/eb810b19-88b0-4ab3-b719-79d3f7865639" />
+
+
