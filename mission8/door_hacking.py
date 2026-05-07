@@ -3,14 +3,11 @@ import time
 import datetime
 import itertools
 import string
-import zlib  # 압축 해제 에러 처리를 위해 추가
+import zlib
 
 def unlock_zip():
     zip_filename = 'emergency_storage_key.zip'
     output_filename = 'password.txt'
-    
-    chars = string.ascii_lowercase + string.digits
-    password_length = 6
     
     try:
         zip_file = zipfile.ZipFile(zip_filename)
@@ -31,29 +28,62 @@ def unlock_zip():
     start_time = time.time()
     start_datetime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     print(f'해킹 시작 시간: {start_datetime}')
-    print('암호 해독을 시작합니다...\n')
+    
+    # 1단계: 화성 및 생존 관련 6자리 우선순위 단어장(Dictionary) 생성
+    priority_passwords = []
+    
+    # 6자리 완전한 단어들
+    priority_passwords.extend(['coffee', 'oxygen', 'planet', 'rocket', 'apollo', 'system', 'rescue', 'secret'])
+    
+    # 4자리 단어 + 2자리 숫자 (예: mars00 ~ mars99)
+    for base_word in ['mars', 'ares', 'base', 'crew', 'star', 'dust', 'java', 'cafe', 'food']:
+        for i in range(100):
+            priority_passwords.append(f'{base_word}{i:02d}')
+            
+    # 5자리 단어 + 1자리 숫자 (예: earth0 ~ earth9)
+    for base_word in ['space', 'earth', 'water', 'alien']:
+        for i in range(10):
+            priority_passwords.append(f'{base_word}{i}')
 
     iteration = 0
     found_password = None
 
-    for guess_tuple in itertools.product(chars, repeat=password_length):
+    print(f'1단계: 화성 기지 관련 패턴 {len(priority_passwords)}개 우선 탐색을 시작합니다...\n')
+    
+    for guess in priority_passwords:
         iteration += 1
-        guess = ''.join(guess_tuple)
-        
-        if iteration % 100000 == 0:
-            elapsed = time.time() - start_time
-            print(f'반복 횟수: {iteration}, 현재 시도: {guess}, 진행 시간: {elapsed:.2f}초')
-
         try:
             zip_file.read(test_file, pwd=guess.encode('utf-8'))
             found_password = guess
+            print(f'>>> 1단계 우선 탐색에서 암호를 찾았습니다!')
             break
         except (RuntimeError, zlib.error, zipfile.BadZipFile):
-            # 암호가 틀렸을 때 발생하는 정상적인(?) 에러들이므로 무시하고 계속 진행
             pass
         except Exception:
-            # 기타 다른 예외가 발생하더라도 루프를 멈추지 않고 다음 암호를 시도
             pass
+
+    # 2단계: 1단계에서 못 찾았을 경우 전체 무차별 대입 공격 실행
+    if not found_password:
+        print('1단계 우선 탐색 실패. 2단계: 전체 무차별 대입(Brute-force) 공격으로 전환합니다...\n')
+        chars = string.ascii_lowercase + string.digits
+        password_length = 6
+        
+        for guess_tuple in itertools.product(chars, repeat=password_length):
+            iteration += 1
+            guess = ''.join(guess_tuple)
+            
+            if iteration % 100000 == 0:
+                elapsed = time.time() - start_time
+                print(f'반복 횟수: {iteration}, 현재 시도: {guess}, 진행 시간: {elapsed:.2f}초')
+
+            try:
+                zip_file.read(test_file, pwd=guess.encode('utf-8'))
+                found_password = guess
+                break
+            except (RuntimeError, zlib.error, zipfile.BadZipFile):
+                pass
+            except Exception:
+                pass
 
     total_elapsed = time.time() - start_time
 
