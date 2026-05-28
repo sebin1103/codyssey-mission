@@ -15,7 +15,7 @@
 | `threading` | 백그라운드 녹음/STT 워커, 종료 신호용 Event | `record_audio`, `_start_recording`, `_run_stt_in_thread` |
 | `tkinter` (+ `ttk`, `filedialog`, `messagebox`) | GUI 구현 (창, 위젯, 다이얼로그, 파일 선택, 메시지 박스) | `JavisGUI` 클래스 전체 |
 
-### 1-2. 외부 라이브러리 (제약조건상 허용된 2개만)
+### 1-2. 외부 라이브러리 
 
 | 라이브러리 | 주요 용도 | 허용 근거 |
 | --- | --- | --- |
