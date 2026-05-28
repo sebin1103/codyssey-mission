@@ -145,20 +145,6 @@ def get_microphone_info(audio):
 - `get_default_input_device_info()`: OS의 기본 입력 장치를 자동 선택. 사용자가 별도 설정 없이도 동작하도록.
 - **왜 `pyaudio`?** 파이썬 표준 라이브러리에는 마이크 캡처 기능이 없음. `pyaudio`는 크로스 플랫폼이고 미션 제약상 명시적으로 허용됨.
 
-#### `save_wav_file(file_path, audio, frames)` — `wave` + `pyaudio`
-
-```python
-def save_wav_file(file_path, audio, frames):
-    with wave.open(file_path, 'wb') as wf:
-        wf.setnchannels(CHANNELS)
-        wf.setsampwidth(audio.get_sample_size(FORMAT))
-        wf.setframerate(RATE)
-        wf.writeframes(b''.join(frames))
-```
-
-- `wave.open(path, 'wb')`: 표준 라이브러리만으로 WAV 파일 헤더를 정확히 작성할 수 있음. 외부 라이브러리 불필요.
-- `audio.get_sample_size(FORMAT)`: `pyaudio.paInt16` 같은 포맷 상수에 대응되는 바이트 수를 계산. WAV 헤더의 `sampwidth` 필드에 들어감.
-- `frames`는 `stream.read()`로 얻은 PCM 청크 리스트이고, `b''.join(frames)`으로 한 번에 직렬화해 디스크 I/O를 최소화.
 
 #### `record_audio_with_event(stop_event, status_callback=None)` — GUI/스레드용 
 
