@@ -1,3 +1,4 @@
+<img width="419" height="363" alt="스크린샷 2026-05-28 오후 4 18 40" src="https://github.com/user-attachments/assets/64b6a50f-ccf9-4dcb-a1dc-6b44492389fe" />
 
 ## 0. 기능
 
@@ -634,4 +635,6 @@ if __name__ == '__main__':
 <img width="426" height="245" alt="스크린샷 2026-05-28 오후 4 16 54" src="https://github.com/user-attachments/assets/11de7d4b-033f-4c43-8e1e-ee3e3d7f6573" />
 
 <img width="1170" height="741" alt="스크린샷 2026-05-28 오후 4 17 20" src="https://github.com/user-attachments/assets/5e09c5fa-447c-4f8e-8a66-8a85839a75ac" />
+
+<img width="243" height="140" alt="스크린샷 2026-05-28 오후 4 18 26" src="https://github.com/user-attachments/assets/1ed93abc-cfcb-4e80-bb87-a5acf0c051a0" />
 
