@@ -622,3 +622,16 @@ if __name__ == '__main__':
 - tkinter 미설치 환경에서는 자동으로 CLI 폴백 → 어떤 환경에서도 멈추지 않고 동작.
 
 ---
+
+## 5. GUI 화면
+
+<img width="1175" height="740" alt="스크린샷 2026-05-28 오후 4 14 39" src="https://github.com/user-attachments/assets/94d10149-0607-4961-b550-a201366c1cc9" />
+
+<img width="357" height="273" alt="스크린샷 2026-05-28 오후 4 16 33" src="https://github.com/user-attachments/assets/865c234d-e86d-43b3-81a8-6a2006866199" />
+
+<img width="1178" height="745" alt="스크린샷 2026-05-28 오후 4 16 19" src="https://github.com/user-attachments/assets/bdfe7e09-2817-4d0b-a400-eaf86820e06b" />
+
+<img width="426" height="245" alt="스크린샷 2026-05-28 오후 4 16 54" src="https://github.com/user-attachments/assets/11de7d4b-033f-4c43-8e1e-ee3e3d7f6573" />
+
+<img width="1170" height="741" alt="스크린샷 2026-05-28 오후 4 17 20" src="https://github.com/user-attachments/assets/5e09c5fa-447c-4f8e-8a66-8a85839a75ac" />
+
