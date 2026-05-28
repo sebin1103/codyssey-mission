@@ -1,4 +1,3 @@
-<img width="419" height="363" alt="스크린샷 2026-05-28 오후 4 18 40" src="https://github.com/user-attachments/assets/64b6a50f-ccf9-4dcb-a1dc-6b44492389fe" />
 
 ## 0. 기능
 
