@@ -1,21 +1,10 @@
-"""
-mars_weather_summary.py
-
-화성 날씨 데이터를 MySQL 데이터베이스에 저장하는 스크립트.
-MySQLHelper 클래스를 통해 DB 연결 및 쿼리를 관리한다.
-"""
-
 import csv
 import mysql.connector
 
-
-# ──────────────────────────────────────────────
-# 데이터베이스 접속 정보 (환경에 맞게 수정)
-# ──────────────────────────────────────────────
 DB_HOST = 'localhost'
 DB_PORT = 3306
 DB_USER = 'root'
-DB_PASSWORD = 'dodi5231'
+DB_PASSWORD = 'dddd'
 DB_NAME = 'mars_mission'
 
 CSV_FILE_PATH = 'mars_weathers_data.csv'
