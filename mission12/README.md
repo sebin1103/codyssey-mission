@@ -319,3 +319,6 @@ mysql -u root -p < mars_weather_ddl.sql
 > ```python
 > CSV_FILE_PATH = '/Users/sebin/Desktop/src/mars_weathers_data.csv'
 > ```
+
+## 4. 실행 화면 
+<img width="807" height="348" alt="스크린샷 2026-06-05 오후 7 38 35" src="https://github.com/user-attachments/assets/47c18992-d378-4f51-a1ad-0c34bbf0e199" />
